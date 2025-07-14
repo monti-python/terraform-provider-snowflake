@@ -1,6 +1,6 @@
 # Snowflake BCR migration guide
 
-This document is meant to help you migrate your Terraform config and maintain compatibility after enabling given [Snowflake BCR Bundle](https://docs.snowflake.com/en/release-notes/behavior-changes). 
+This document is meant to help you migrate your Terraform config and maintain compatibility after enabling given [Snowflake BCR Bundle](https://docs.snowflake.com/en/release-notes/behavior-changes).
 Some of the breaking changes on Snowflake side may be not compatible with the current version of the Terraform provider, so you may need to update your Terraform config to adapt to the new behavior.
 As some changes may require work on the provider side, we advise you to always use the latest version of the provider ([new features and fixes policy](https://docs.snowflake.com/en/user-guide/terraform#new-features-and-fixes)).
 To avoid any issues and follow [migration guide](https://github.com/snowflakedb/terraform-provider-snowflake/blob/main/MIGRATION_GUIDE.md) when migrating to newer versions.
@@ -10,6 +10,23 @@ command to enable the bundle manually, and then the [SYSTEM\$DISABLE_BEHAVIOR_CH
 
 Remember that only changes that affect the provider are listed here, to get the full list of changes, please refer to the [Snowflake BCR Bundle documentation](https://docs.snowflake.com/en/release-notes/behavior-changes).
 The `snowflake_execute` resource won't be listed here, as it is users' responsibility to check the SQL commands executed and adapt them to the new behavior.
+
+## [Bundle 2025_04](https://docs.snowflake.com/en/release-notes/bcr-bundles/2025_04_bundle)
+
+### Primary role requires stage access during `CREATE EXTERNAL TABLE` command
+
+Creating an external table succeeds only if a user’s primary role has the `USAGE` privilege on the stage referenced in the `snowflake_external_table` resource. If you manage external tables in the provider, please grant the `USAGE` privilege on the relevant stages to the connection role.
+
+Reference: [BCR-1993](https://docs.snowflake.com/en/release-notes/bcr-bundles/2025_04/bcr-1993)
+
+### `MFA_AUTHENTICATION_METHODS` property in authentication policies is now deprecated
+<!-- TODO(SNOW-2187814): Update this entry. -->
+
+The `MFA_AUTHENTICATION_METHODS` property is deprecated. A new `MFA_POLICY` property is available with an `ENFORCE_MFA_ON_EXTERNAL_AUTHENTICATION` option, which accepts `ALL` or `NONE` as values.
+Authentication policies with the `MFA_AUTHENTICATION_METHODS` specified return a deprecation message under the DESCRIPTION column in the output of a DESCRIBE AUTHENTICATION POLICY command.
+This will be addressed in the next versions of the provider.
+
+Reference: [BCR-1971](https://docs.snowflake.com/en/release-notes/bcr-bundles/2025_04/bcr-1971)
 
 ## [Bundle 2025_03](https://docs.snowflake.com/en/release-notes/bcr-bundles/2025_03_bundle)
 
